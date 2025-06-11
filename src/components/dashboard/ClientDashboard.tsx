@@ -15,6 +15,10 @@ export const ClientDashboard = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
 
+  // Log para debug
+  console.log('ClientDashboard rendered for user:', user);
+  console.log('Has monthly plan:', hasMonthlyPlan);
+
   // Dados mockados - em produção vir do Supabase
   const upcomingAppointments = [
     {

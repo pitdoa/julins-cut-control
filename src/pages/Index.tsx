@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, Clock, Scissors, Star, Users, MapPin, Phone } from 'lucide-react';
@@ -17,30 +16,29 @@ const Index = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const { user, userType, hasMonthlyPlan } = useAuthStore();
 
-  // Se usuário logado, mostrar o modal de planos primeiro (se não tiver plano)
-  const handleUserLogin = () => {
-    if (!hasMonthlyPlan) {
-      setShowPlanModal(true);
-    }
-  };
+  // Log para debug
+  console.log('User state:', { user, userType, hasMonthlyPlan });
 
   // Callback para quando um plano é selecionado
   const handlePlanSelected = () => {
+    setShowPlanModal(false);
     setShowPaymentModal(true);
   };
 
   // Se usuário logado, mostrar dashboard correspondente
   if (user) {
-    // Mostrar modais se necessário
-    if (!hasMonthlyPlan && userType === 'client') {
+    console.log('User logged in, showing dashboard for type:', userType);
+    
+    if (userType === 'admin') {
+      return <AdminDashboard />;
+    }
+    if (userType === 'employee') {
+      return <EmployeeDashboard />;
+    }
+    if (userType === 'client') {
       return (
         <>
-          <div className="min-h-screen bg-background flex items-center justify-center">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold mb-4">Preparando seu acesso...</h2>
-              <p className="text-muted-foreground">Escolha um plano ou continue sem plano</p>
-            </div>
-          </div>
+          <ClientDashboard />
           <PlanSelectionModal 
             open={showPlanModal} 
             onOpenChange={setShowPlanModal}
@@ -49,21 +47,13 @@ const Index = () => {
           <PaymentModal
             open={showPaymentModal}
             onOpenChange={setShowPaymentModal}
-            planName="Plano Selecionado"
+            planName="Plano Mensal Básico"
             planPrice="R$ 80,00"
             isSubscription={true}
           />
         </>
       );
     }
-
-    if (userType === 'admin') {
-      return <AdminDashboard />;
-    }
-    if (userType === 'employee') {
-      return <EmployeeDashboard />;
-    }
-    return <ClientDashboard />;
   }
 
   return (

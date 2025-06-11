@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,7 +34,8 @@ export const EmployeeDashboard = () => {
       status: 'confirmed',
       notes: 'Cliente prefere degradê baixo',
       price: 'R$ 40,00',
-      type: 'regular'
+      type: 'regular',
+      date: undefined as string | undefined
     },
     {
       id: '2',
@@ -46,7 +46,8 @@ export const EmployeeDashboard = () => {
       status: 'confirmed',
       notes: '',
       price: 'R$ 25,00',
-      type: 'regular'
+      type: 'regular',
+      date: undefined as string | undefined
     },
     {
       id: '3',
@@ -57,7 +58,8 @@ export const EmployeeDashboard = () => {
       status: 'completed',
       notes: 'Barba modelada',
       price: 'R$ 15,00',
-      type: 'regular'
+      type: 'regular',
+      date: undefined as string | undefined
     },
     {
       id: '4',
@@ -68,7 +70,8 @@ export const EmployeeDashboard = () => {
       status: 'no_show',
       notes: 'Cliente não compareceu',
       price: 'R$ 40,00',
-      type: 'regular'
+      type: 'regular',
+      date: undefined as string | undefined
     },
     {
       id: '5',
@@ -79,7 +82,8 @@ export const EmployeeDashboard = () => {
       status: 'confirmed',
       notes: 'Corte mensal incluído',
       price: 'Plano R$ 80,00',
-      type: 'plan'
+      type: 'plan',
+      date: undefined as string | undefined
     }
   ];
 

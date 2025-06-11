@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,12 +6,14 @@ import { Calendar, Clock, Scissors, User, LogOut, Plus, CreditCard } from 'lucid
 import { useAuthStore } from '@/store/authStore';
 import { BookingModal } from '../booking/BookingModal';
 import { PaymentModal } from '../payment/PaymentModal';
+import { ProfileEditModal } from '../profile/ProfileEditModal';
 import { toast } from '@/hooks/use-toast';
 
 export const ClientDashboard = () => {
   const { user, logout, hasMonthlyPlan } = useAuthStore();
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   // Dados mockados - em produção vir do Supabase
   const upcomingAppointments = [
@@ -266,7 +267,11 @@ export const ClientDashboard = () => {
                     <p className="text-sm text-muted-foreground">Telefone</p>
                     <p className="font-medium">{user?.phone}</p>
                   </div>
-                  <Button variant="outline" className="w-full">
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => setShowProfileModal(true)}
+                  >
                     Editar Perfil
                   </Button>
                 </div>
@@ -313,6 +318,11 @@ export const ClientDashboard = () => {
         planName="Plano Mensal Básico"
         planPrice="R$ 80,00"
         isSubscription={true}
+      />
+
+      <ProfileEditModal
+        open={showProfileModal}
+        onOpenChange={setShowProfileModal}
       />
     </div>
   );

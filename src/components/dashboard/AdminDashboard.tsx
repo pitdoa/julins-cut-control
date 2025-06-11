@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,7 +29,6 @@ export const AdminDashboard = () => {
   const { user, logout } = useAuthStore();
   const [newBarberName, setNewBarberName] = useState('');
   const [newBarberEmail, setNewBarberEmail] = useState('');
-  const [smsConfig, setSmsConfig] = useState('');
 
   // Dados mockados para demonstração
   const todayAppointments = [
@@ -171,13 +169,6 @@ export const AdminDashboard = () => {
     });
   };
 
-  const handleSaveSmsConfig = () => {
-    toast({
-      title: "Configuração salva!",
-      description: "API de SMS configurada com sucesso",
-    });
-  };
-
   const handleSendSms = (clientPhone: string) => {
     toast({
       title: "SMS enviado!",
@@ -210,13 +201,12 @@ export const AdminDashboard = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="overview" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">Visão Geral</TabsTrigger>
             <TabsTrigger value="appointments">Agendamentos</TabsTrigger>
             <TabsTrigger value="barbers">Barbeiros</TabsTrigger>
             <TabsTrigger value="clients">Clientes</TabsTrigger>
             <TabsTrigger value="insights">IA Insights</TabsTrigger>
-            <TabsTrigger value="settings">Configurações</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-8">
@@ -543,60 +533,6 @@ export const AdminDashboard = () => {
                       </CardContent>
                     </Card>
                   ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="settings" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Settings className="mr-2 h-5 w-5" />
-                  Configurações do Sistema
-                </CardTitle>
-                <CardDescription>
-                  Configure APIs e integrações
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  <div>
-                    <Label htmlFor="sms-api">API de SMS - Webhook URL</Label>
-                    <div className="flex space-x-2 mt-2">
-                      <Input
-                        id="sms-api"
-                        value={smsConfig}
-                        onChange={(e) => setSmsConfig(e.target.value)}
-                        placeholder="https://api.sms-provider.com/send"
-                        className="flex-1"
-                      />
-                      <Button onClick={handleSaveSmsConfig}>
-                        Salvar
-                      </Button>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Configure a URL da API para envio automático de SMS
-                    </p>
-                  </div>
-
-                  <div>
-                    <Label>Mensagens SMS Configuradas</Label>
-                    <div className="space-y-2 mt-2">
-                      <div className="p-3 border rounded-lg">
-                        <p className="font-medium">Lembrete de Agendamento</p>
-                        <p className="text-sm text-muted-foreground">
-                          "Olá [NOME], você tem um agendamento na Barbearia do Julinho amanhã às [HORARIO]. Confirme sua presença!"
-                        </p>
-                      </div>
-                      <div className="p-3 border rounded-lg">
-                        <p className="font-medium">Confirmação de Agendamento</p>
-                        <p className="text-sm text-muted-foreground">
-                          "Agendamento confirmado! [NOME], seu corte está marcado para [DATA] às [HORARIO] com [BARBEIRO]."
-                        </p>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </CardContent>
             </Card>

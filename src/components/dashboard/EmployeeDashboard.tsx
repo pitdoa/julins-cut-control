@@ -13,7 +13,9 @@ import {
   CheckCircle, 
   XCircle,
   FileText,
-  Scissors
+  Scissors,
+  MessageSquare,
+  Edit
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { toast } from '@/hooks/use-toast';
@@ -31,7 +33,9 @@ export const EmployeeDashboard = () => {
       service: 'Corte + Barba',
       phone: '(11) 99999-9999',
       status: 'confirmed',
-      notes: 'Cliente prefere degradê baixo'
+      notes: 'Cliente prefere degradê baixo',
+      price: 'R$ 40,00',
+      type: 'regular'
     },
     {
       id: '2',
@@ -40,7 +44,9 @@ export const EmployeeDashboard = () => {
       service: 'Corte Tradicional',
       phone: '(11) 88888-8888',
       status: 'confirmed',
-      notes: ''
+      notes: '',
+      price: 'R$ 25,00',
+      type: 'regular'
     },
     {
       id: '3',
@@ -49,7 +55,9 @@ export const EmployeeDashboard = () => {
       service: 'Apenas Barba',
       phone: '(11) 77777-7777',
       status: 'completed',
-      notes: 'Barba modelada'
+      notes: 'Barba modelada',
+      price: 'R$ 15,00',
+      type: 'regular'
     },
     {
       id: '4',
@@ -58,7 +66,86 @@ export const EmployeeDashboard = () => {
       service: 'Corte + Barba',
       phone: '(11) 66666-6666',
       status: 'no_show',
-      notes: 'Cliente não compareceu'
+      notes: 'Cliente não compareceu',
+      price: 'R$ 40,00',
+      type: 'regular'
+    },
+    {
+      id: '5',
+      time: '16:00',
+      client: 'Ana Costa',
+      service: 'Plano Mensal',
+      phone: '(11) 55555-5555',
+      status: 'confirmed',
+      notes: 'Corte mensal incluído',
+      price: 'Plano R$ 80,00',
+      type: 'plan'
+    }
+  ];
+
+  // Todos os agendamentos (incluindo outros dias)
+  const allAppointments = [
+    ...todaySchedule,
+    {
+      id: '6',
+      time: '09:30',
+      client: 'Maria Santos',
+      service: 'Corte Feminino',
+      phone: '(11) 44444-4444',
+      status: 'confirmed',
+      notes: '',
+      price: 'R$ 35,00',
+      type: 'regular',
+      date: '2024-06-16'
+    },
+    {
+      id: '7',
+      time: '11:00',
+      client: 'José Silva',
+      service: 'Plano Mensal',
+      phone: '(11) 33333-3333',
+      status: 'confirmed',
+      notes: 'Cliente do plano mensal',
+      price: 'Plano R$ 80,00',
+      type: 'plan',
+      date: '2024-06-16'
+    }
+  ];
+
+  // Lista de clientes
+  const clients = [
+    {
+      id: '1',
+      name: 'João Silva',
+      email: 'joao@email.com',
+      phone: '(11) 99999-9999',
+      lastVisit: '2024-06-10',
+      totalVisits: 15,
+      hasPlan: false,
+      preferredService: 'Corte + Barba',
+      notes: 'Prefere degradê baixo'
+    },
+    {
+      id: '2',
+      name: 'Pedro Santos',
+      email: 'pedro@email.com',
+      phone: '(11) 88888-8888',
+      lastVisit: '2024-06-08',
+      totalVisits: 8,
+      hasPlan: false,
+      preferredService: 'Corte Tradicional',
+      notes: 'Cliente pontual'
+    },
+    {
+      id: '3',
+      name: 'Ana Costa',
+      email: 'ana@email.com',
+      phone: '(11) 55555-5555',
+      lastVisit: '2024-06-12',
+      totalVisits: 12,
+      hasPlan: true,
+      preferredService: 'Corte Mensal',
+      notes: 'Assinante do plano mensal'
     }
   ];
 
@@ -66,7 +153,8 @@ export const EmployeeDashboard = () => {
     totalAppointments: 32,
     completed: 28,
     noShows: 4,
-    revenue: 840
+    revenue: 840,
+    planClients: 6
   };
 
   const handleConfirmAppointment = (appointmentId: string) => {
@@ -88,6 +176,13 @@ export const EmployeeDashboard = () => {
     toast({
       title: "Anotações salvas",
       description: "Suas observações foram registradas",
+    });
+  };
+
+  const handleSendSms = (clientPhone: string) => {
+    toast({
+      title: "SMS enviado!",
+      description: `Mensagem enviada para ${clientPhone}`,
     });
   };
 
@@ -116,15 +211,17 @@ export const EmployeeDashboard = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="today" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="today">Agenda de Hoje</TabsTrigger>
+            <TabsTrigger value="all-appointments">Todos Agendamentos</TabsTrigger>
+            <TabsTrigger value="clients">Clientes</TabsTrigger>
             <TabsTrigger value="week">Semana</TabsTrigger>
             <TabsTrigger value="notes">Anotações</TabsTrigger>
           </TabsList>
 
           <TabsContent value="today" className="space-y-6">
             {/* Stats Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <Card>
                 <CardContent className="p-4">
                   <div className="text-2xl font-bold text-accent">{todaySchedule.length}</div>
@@ -158,6 +255,15 @@ export const EmployeeDashboard = () => {
                   <p className="text-sm text-muted-foreground">Faltas</p>
                 </CardContent>
               </Card>
+
+              <Card>
+                <CardContent className="p-4">
+                  <div className="text-2xl font-bold text-purple-600">
+                    {todaySchedule.filter(a => a.type === 'plan').length}
+                  </div>
+                  <p className="text-sm text-muted-foreground">Planos</p>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Today's Schedule */}
@@ -173,13 +279,18 @@ export const EmployeeDashboard = () => {
                   {todaySchedule.map((appointment) => (
                     <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg">
                       <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center">
-                          <Clock className="h-6 w-6 text-accent" />
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                          appointment.type === 'plan' ? 'bg-purple-100' : 'bg-accent/10'
+                        }`}>
+                          <Clock className={`h-6 w-6 ${
+                            appointment.type === 'plan' ? 'text-purple-600' : 'text-accent'
+                          }`} />
                         </div>
                         <div>
                           <p className="font-semibold">{appointment.time} - {appointment.client}</p>
                           <p className="text-sm text-muted-foreground">{appointment.service}</p>
                           <p className="text-sm text-muted-foreground">{appointment.phone}</p>
+                          <p className="text-sm font-medium text-green-600">{appointment.price}</p>
                           {appointment.notes && (
                             <p className="text-sm text-blue-600 italic">💡 {appointment.notes}</p>
                           )}
@@ -190,13 +301,24 @@ export const EmployeeDashboard = () => {
                         <Badge 
                           variant={
                             appointment.status === 'completed' ? 'default' :
-                            appointment.status === 'no_show' ? 'destructive' : 'secondary'
+                            appointment.status === 'no_show' ? 'destructive' : 
+                            appointment.type === 'plan' ? 'secondary' : 'secondary'
                           }
+                          className={appointment.type === 'plan' ? 'bg-purple-100 text-purple-800' : ''}
                         >
                           {appointment.status === 'completed' ? 'Concluído' :
-                           appointment.status === 'no_show' ? 'Falta' : 'Confirmado'}
+                           appointment.status === 'no_show' ? 'Falta' : 
+                           appointment.type === 'plan' ? 'Plano' : 'Confirmado'}
                         </Badge>
                         
+                        <Button
+                          size="sm"
+                          onClick={() => handleSendSms(appointment.phone)}
+                          className="bg-green-500 hover:bg-green-600"
+                        >
+                          <MessageSquare className="h-4 w-4" />
+                        </Button>
+
                         {appointment.status === 'confirmed' && (
                           <div className="flex space-x-1">
                             <Button
@@ -223,13 +345,121 @@ export const EmployeeDashboard = () => {
             </Card>
           </TabsContent>
 
+          <TabsContent value="all-appointments" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Todos os Agendamentos</CardTitle>
+                <CardDescription>
+                  Visualize e gerencie todos os agendamentos
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {allAppointments.map((appointment) => (
+                    <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center space-x-4">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                          appointment.type === 'plan' ? 'bg-purple-100' : 'bg-accent/10'
+                        }`}>
+                          <Calendar className={`h-5 w-5 ${
+                            appointment.type === 'plan' ? 'text-purple-600' : 'text-accent'
+                          }`} />
+                        </div>
+                        <div>
+                          <p className="font-semibold">{appointment.client}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {appointment.service} - {appointment.time}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {appointment.date ? new Date(appointment.date).toLocaleDateString('pt-BR') : 'Hoje'}
+                          </p>
+                          <p className="text-sm font-medium text-green-600">{appointment.price}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Badge 
+                          variant={appointment.status === 'completed' ? 'default' : 'secondary'}
+                          className={appointment.type === 'plan' ? 'bg-purple-100 text-purple-800' : ''}
+                        >
+                          {appointment.status === 'completed' ? 'Concluído' : 'Agendado'}
+                        </Badge>
+                        <Button
+                          size="sm"
+                          onClick={() => handleSendSms(appointment.phone)}
+                          className="bg-green-500 hover:bg-green-600"
+                        >
+                          <MessageSquare className="h-4 w-4" />
+                        </Button>
+                        <Button size="sm" variant="outline">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="clients" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Meus Clientes</CardTitle>
+                <CardDescription>
+                  Visualize informações dos seus clientes
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {clients.map((client) => (
+                    <div key={client.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold">
+                          {client.name.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="font-semibold">{client.name}</p>
+                          <p className="text-sm text-muted-foreground">{client.email}</p>
+                          <p className="text-sm text-muted-foreground">{client.phone}</p>
+                          <div className="flex items-center space-x-4 mt-1">
+                            <span className="text-sm">Última visita: {new Date(client.lastVisit).toLocaleDateString('pt-BR')}</span>
+                            <span className="text-sm">{client.totalVisits} visitas</span>
+                            {client.hasPlan && (
+                              <Badge className="bg-purple-100 text-purple-800">Plano Ativo</Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-blue-600 italic">Preferência: {client.preferredService}</p>
+                          {client.notes && (
+                            <p className="text-sm text-gray-600">💡 {client.notes}</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button
+                          size="sm"
+                          onClick={() => handleSendSms(client.phone)}
+                          className="bg-green-500 hover:bg-green-600"
+                        >
+                          <MessageSquare className="h-4 w-4" />
+                        </Button>
+                        <Button size="sm" variant="outline">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="week" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>Estatísticas da Semana</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
                   <div className="text-center">
                     <div className="text-3xl font-bold text-accent">{weekStats.totalAppointments}</div>
                     <p className="text-sm text-muted-foreground">Total de Atendimentos</p>
@@ -248,6 +478,11 @@ export const EmployeeDashboard = () => {
                   <div className="text-center">
                     <div className="text-3xl font-bold text-accent">R$ {weekStats.revenue}</div>
                     <p className="text-sm text-muted-foreground">Receita Gerada</p>
+                  </div>
+
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-purple-600">{weekStats.planClients}</div>
+                    <p className="text-sm text-muted-foreground">Clientes Plano</p>
                   </div>
                 </div>
               </CardContent>

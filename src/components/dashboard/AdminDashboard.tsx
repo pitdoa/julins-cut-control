@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { toast } from '@/hooks/use-toast';
+import { PlansManagement } from '@/components/admin/PlansManagement';
 
 export const AdminDashboard = () => {
   const { user, logout } = useAuthStore();
@@ -201,11 +202,12 @@ export const AdminDashboard = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="overview" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview">Visão Geral</TabsTrigger>
             <TabsTrigger value="appointments">Agendamentos</TabsTrigger>
             <TabsTrigger value="barbers">Barbeiros</TabsTrigger>
             <TabsTrigger value="clients">Clientes</TabsTrigger>
+            <TabsTrigger value="plans">Planos</TabsTrigger>
             <TabsTrigger value="insights">IA Insights</TabsTrigger>
           </TabsList>
 
@@ -501,6 +503,10 @@ export const AdminDashboard = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="plans" className="space-y-6">
+            <PlansManagement />
           </TabsContent>
 
           <TabsContent value="insights" className="space-y-6">

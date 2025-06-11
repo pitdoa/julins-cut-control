@@ -4,18 +4,64 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, Clock, Scissors, Star, Users, MapPin, Phone } from 'lucide-react';
 import { AuthModal } from '@/components/auth/AuthModal';
+import { PlanSelectionModal } from '@/components/plans/PlanSelectionModal';
+import { PaymentModal } from '@/components/payment/PaymentModal';
 import { useAuthStore } from '@/store/authStore';
 import { ClientDashboard } from '@/components/dashboard/ClientDashboard';
 import { AdminDashboard } from '@/components/dashboard/AdminDashboard';
+import { EmployeeDashboard } from '@/components/dashboard/EmployeeDashboard';
 
 const Index = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const { user, userType } = useAuthStore();
+  const [showPlanModal, setShowPlanModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const { user, userType, hasMonthlyPlan } = useAuthStore();
+
+  // Se usuário logado, mostrar o modal de planos primeiro (se não tiver plano)
+  const handleUserLogin = () => {
+    if (!hasMonthlyPlan) {
+      setShowPlanModal(true);
+    }
+  };
+
+  // Callback para quando um plano é selecionado
+  const handlePlanSelected = () => {
+    setShowPaymentModal(true);
+  };
 
   // Se usuário logado, mostrar dashboard correspondente
   if (user) {
+    // Mostrar modais se necessário
+    if (!hasMonthlyPlan && userType === 'client') {
+      return (
+        <>
+          <div className="min-h-screen bg-background flex items-center justify-center">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold mb-4">Preparando seu acesso...</h2>
+              <p className="text-muted-foreground">Escolha um plano ou continue sem plano</p>
+            </div>
+          </div>
+          <PlanSelectionModal 
+            open={showPlanModal} 
+            onOpenChange={setShowPlanModal}
+            onPlanSelected={handlePlanSelected}
+          />
+          <PaymentModal
+            open={showPaymentModal}
+            onOpenChange={setShowPaymentModal}
+            planName="Plano Selecionado"
+            planPrice="R$ 80,00"
+            isSubscription={true}
+          />
+        </>
+      );
+    }
+
     if (userType === 'admin') {
       return <AdminDashboard />;
+    }
+    if (userType === 'employee') {
+      return <EmployeeDashboard />;
     }
     return <ClientDashboard />;
   }
@@ -27,7 +73,7 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <Scissors className="h-8 w-8 text-accent" />
-            <h1 className="text-2xl font-bold">Barbearia do Julin</h1>
+            <h1 className="text-2xl font-bold">Barbearia do Julinho</h1>
           </div>
           <Button 
             onClick={() => setShowAuthModal(true)}
@@ -124,7 +170,7 @@ const Index = () => {
                 <div className="w-24 h-24 mx-auto bg-accent rounded-full flex items-center justify-center mb-4">
                   <Scissors className="h-12 w-12 text-black" />
                 </div>
-                <CardTitle>Julin</CardTitle>
+                <CardTitle>Julinho</CardTitle>
                 <CardDescription>Proprietário & Barbeiro Master</CardDescription>
               </CardHeader>
               <CardContent>
@@ -203,7 +249,7 @@ const Index = () => {
             Pronto para o seu próximo corte?
           </h3>
           <p className="text-xl mb-8 text-gray-300">
-            Agende agora e garante seu horário com os melhores barbeiros da cidade
+            Agende agora e garanta seu horário com os melhores barbeiros da cidade
           </p>
           <Button 
             onClick={() => setShowAuthModal(true)}
@@ -221,10 +267,10 @@ const Index = () => {
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <Scissors className="h-6 w-6 text-accent" />
-            <span className="text-xl font-bold">Barbearia do Julin</span>
+            <span className="text-xl font-bold">Barbearia do Julinho</span>
           </div>
           <p className="text-gray-400">
-            © 2024 Barbearia do Julin. Todos os direitos reservados.
+            © 2024 Barbearia do Julinho. Todos os direitos reservados.
           </p>
         </div>
       </footer>

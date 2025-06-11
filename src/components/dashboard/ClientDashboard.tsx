@@ -6,11 +6,13 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, Scissors, User, LogOut, Plus, CreditCard } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { BookingModal } from '../booking/BookingModal';
+import { PaymentModal } from '../payment/PaymentModal';
 import { toast } from '@/hooks/use-toast';
 
 export const ClientDashboard = () => {
-  const { user, logout } = useAuthStore();
+  const { user, logout, hasMonthlyPlan } = useAuthStore();
   const [showBookingModal, setShowBookingModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   // Dados mockados - em produção vir do Supabase
   const upcomingAppointments = [
@@ -18,7 +20,7 @@ export const ClientDashboard = () => {
       id: '1',
       date: '2024-06-15',
       time: '14:30',
-      barber: 'Julin',
+      barber: 'Julinho',
       service: 'Corte + Barba',
       price: 'R$ 40,00',
       status: 'confirmed'
@@ -39,7 +41,7 @@ export const ClientDashboard = () => {
       id: '3',
       date: '2024-06-01',
       time: '16:00',
-      barber: 'Julin',
+      barber: 'Julinho',
       service: 'Corte + Barba',
       price: 'R$ 40,00',
       status: 'completed'
@@ -55,19 +57,23 @@ export const ClientDashboard = () => {
     }
   ];
 
-  const monthlyPlan = {
+  const monthlyPlan = hasMonthlyPlan ? {
     active: true,
     cutsRemaining: 2,
     totalCuts: 4,
     renewalDate: '2024-07-01',
     fixedTime: 'Quinta, 15:00h'
-  };
+  } : null;
 
   const handleCancelAppointment = (appointmentId: string) => {
     toast({
       title: "Agendamento cancelado",
       description: "Seu horário foi liberado com sucesso",
     });
+  };
+
+  const handleSubscribePlan = () => {
+    setShowPaymentModal(true);
   };
 
   return (
@@ -78,7 +84,7 @@ export const ClientDashboard = () => {
           <div className="flex items-center space-x-3">
             <Scissors className="h-8 w-8 text-accent" />
             <div>
-              <h1 className="text-xl font-bold">Barbearia do Julin</h1>
+              <h1 className="text-xl font-bold">Barbearia do Julinho</h1>
               <p className="text-sm text-muted-foreground">Bem-vindo, {user?.name}</p>
             </div>
           </div>
@@ -107,7 +113,7 @@ export const ClientDashboard = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Monthly Plan */}
-            {monthlyPlan.active && (
+            {monthlyPlan && (
               <Card className="border-accent/20 bg-gradient-to-r from-accent/5 to-accent/10">
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -281,13 +287,15 @@ export const ClientDashboard = () => {
                   <Plus className="mr-2 h-4 w-4" />
                   Novo Agendamento
                 </Button>
-                <Button
-                  className="w-full golden-gradient text-black font-semibold"
-                  variant="outline"
-                >
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  Assinar Plano Mensal
-                </Button>
+                {!hasMonthlyPlan && (
+                  <Button
+                    onClick={handleSubscribePlan}
+                    className="w-full golden-gradient text-black font-semibold"
+                  >
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    Assinar Plano Mensal
+                  </Button>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -297,6 +305,14 @@ export const ClientDashboard = () => {
       <BookingModal
         open={showBookingModal}
         onOpenChange={setShowBookingModal}
+      />
+
+      <PaymentModal
+        open={showPaymentModal}
+        onOpenChange={setShowPaymentModal}
+        planName="Plano Mensal Básico"
+        planPrice="R$ 80,00"
+        isSubscription={true}
       />
     </div>
   );

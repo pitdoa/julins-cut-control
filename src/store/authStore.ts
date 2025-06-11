@@ -15,6 +15,8 @@ interface AuthState {
   login: (user: User, type: 'client' | 'admin' | 'employee') => void;
   logout: () => void;
   updateUser: (user: Partial<User>) => void;
+  hasMonthlyPlan: boolean;
+  setHasMonthlyPlan: (value: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -22,14 +24,16 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       user: null,
       userType: null,
+      hasMonthlyPlan: false,
       login: (user, type) => set({ user, userType: type }),
-      logout: () => set({ user: null, userType: null }),
+      logout: () => set({ user: null, userType: null, hasMonthlyPlan: false }),
       updateUser: (updatedUser) => {
         const currentUser = get().user;
         if (currentUser) {
           set({ user: { ...currentUser, ...updatedUser } });
         }
       },
+      setHasMonthlyPlan: (value) => set({ hasMonthlyPlan: value }),
     }),
     {
       name: 'barbershop-auth',

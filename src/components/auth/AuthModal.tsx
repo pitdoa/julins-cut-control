@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuthStore } from '@/store/authStore';
 import { toast } from '@/hooks/use-toast';
-import { Scissors, User, Shield } from 'lucide-react';
+import { Scissors, User, Shield, Briefcase } from 'lucide-react';
 
 interface AuthModalProps {
   open: boolean;
@@ -27,23 +27,34 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
-    // Simulação de login - em produção usar Supabase
-    setTimeout(() => {
-      login({
-        id: '1',
-        name: 'João Silva',
-        email: email,
-        phone: '(11) 99999-9999'
-      }, 'client');
-      
-      toast({
-        title: "Login realizado com sucesso!",
-        description: "Bem-vindo à Barbearia do Julin",
-      });
-      
-      setIsLoading(false);
-      onOpenChange(false);
-    }, 1000);
+    // Validação das credenciais do cliente
+    if (email === 'usuario@julin.com' && password === 'usuario123') {
+      setTimeout(() => {
+        login({
+          id: 'user1',
+          name: 'João Silva',
+          email: email,
+          phone: '(11) 99999-9999'
+        }, 'client');
+        
+        toast({
+          title: "Login realizado com sucesso!",
+          description: "Bem-vindo à Barbearia do Julinho",
+        });
+        
+        setIsLoading(false);
+        onOpenChange(false);
+      }, 1000);
+    } else {
+      setTimeout(() => {
+        toast({
+          title: "Erro no login",
+          description: "Credenciais inválidas",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+      }, 1000);
+    }
   };
 
   const handleClientRegister = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -58,7 +69,7 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
     // Simulação de cadastro
     setTimeout(() => {
       login({
-        id: '1',
+        id: 'new_user',
         name: name,
         email: email,
         phone: phone
@@ -82,18 +93,55 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
-    // Login admin - em produção verificar credenciais
-    if (email === 'julin@barbearia.com' && password === 'admin123') {
+    // Login admin
+    if (email === 'admin@julin.com' && password === 'admin123') {
       setTimeout(() => {
         login({
           id: 'admin1',
-          name: 'Julin',
+          name: 'Julinho',
           email: email,
         }, 'admin');
         
         toast({
           title: "Login administrativo realizado!",
           description: "Bem-vindo ao painel de controle",
+        });
+        
+        setIsLoading(false);
+        onOpenChange(false);
+      }, 1000);
+    } else {
+      setTimeout(() => {
+        toast({
+          title: "Erro no login",
+          description: "Credenciais inválidas",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+      }, 1000);
+    }
+  };
+
+  const handleEmployeeLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    // Login funcionário (credenciais de exemplo)
+    if (email === 'funcionario@julin.com' && password === 'func123') {
+      setTimeout(() => {
+        login({
+          id: 'emp1',
+          name: 'Marquinho',
+          email: email,
+        }, 'employee');
+        
+        toast({
+          title: "Login realizado!",
+          description: "Bem-vindo ao painel do funcionário",
         });
         
         setIsLoading(false);
@@ -118,16 +166,17 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
           <div className="flex items-center justify-center mb-4">
             <Scissors className="h-8 w-8 text-accent" />
           </div>
-          <DialogTitle className="text-center">Barbearia do Julin</DialogTitle>
+          <DialogTitle className="text-center">Barbearia do Julinho</DialogTitle>
           <DialogDescription className="text-center">
-            Entre ou cadastre-se para agendar seu corte
+            Entre ou cadastre-se para acessar o sistema
           </DialogDescription>
         </DialogHeader>
 
         <Tabs defaultValue="login" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="login">Entrar</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="login">Cliente</TabsTrigger>
             <TabsTrigger value="register">Cadastrar</TabsTrigger>
+            <TabsTrigger value="employee">Funcionário</TabsTrigger>
             <TabsTrigger value="admin">Admin</TabsTrigger>
           </TabsList>
 
@@ -150,7 +199,7 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
                       id="email"
                       name="email"
                       type="email"
-                      placeholder="seu@email.com"
+                      placeholder="usuario@julin.com"
                       required
                     />
                   </div>
@@ -172,6 +221,9 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
                     {isLoading ? "Entrando..." : "Entrar"}
                   </Button>
                 </form>
+                <p className="text-xs text-muted-foreground mt-2 text-center">
+                  Demo: usuario@julin.com / usuario123
+                </p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -241,6 +293,54 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
             </Card>
           </TabsContent>
 
+          <TabsContent value="employee">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Briefcase className="mr-2 h-5 w-5" />
+                  Login Funcionário
+                </CardTitle>
+                <CardDescription>
+                  Acesso para barbeiros e funcionários
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleEmployeeLogin} className="space-y-4">
+                  <div>
+                    <Label htmlFor="emp-email">Email</Label>
+                    <Input
+                      id="emp-email"
+                      name="email"
+                      type="email"
+                      placeholder="funcionario@julin.com"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="emp-password">Senha</Label>
+                    <Input
+                      id="emp-password"
+                      name="password"
+                      type="password"
+                      placeholder="••••••••"
+                      required
+                    />
+                  </div>
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Entrando..." : "Entrar como Funcionário"}
+                  </Button>
+                </form>
+                <p className="text-xs text-muted-foreground mt-2 text-center">
+                  Demo: funcionario@julin.com / func123
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="admin">
             <Card>
               <CardHeader>
@@ -260,7 +360,7 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
                       id="admin-email"
                       name="email"
                       type="email"
-                      placeholder="julin@barbearia.com"
+                      placeholder="admin@julin.com"
                       required
                     />
                   </div>
@@ -283,7 +383,7 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
                   </Button>
                 </form>
                 <p className="text-xs text-muted-foreground mt-2 text-center">
-                  Demo: julin@barbearia.com / admin123
+                  Demo: admin@julin.com / admin123
                 </p>
               </CardContent>
             </Card>

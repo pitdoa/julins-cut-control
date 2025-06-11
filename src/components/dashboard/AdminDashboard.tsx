@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   Calendar, 
   DollarSign, 
@@ -13,12 +16,21 @@ import {
   TrendingUp, 
   Clock,
   Star,
-  BarChart3
+  BarChart3,
+  MessageSquare,
+  Settings,
+  UserPlus,
+  Edit,
+  Trash
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
+import { toast } from '@/hooks/use-toast';
 
 export const AdminDashboard = () => {
   const { user, logout } = useAuthStore();
+  const [newBarberName, setNewBarberName] = useState('');
+  const [newBarberEmail, setNewBarberEmail] = useState('');
+  const [smsConfig, setSmsConfig] = useState('');
 
   // Dados mockados para demonstração
   const todayAppointments = [
@@ -27,9 +39,10 @@ export const AdminDashboard = () => {
       time: '09:00',
       client: 'João Silva',
       service: 'Corte + Barba',
-      barber: 'Julin',
+      barber: 'Julinho',
       price: 'R$ 40,00',
-      status: 'confirmed'
+      status: 'confirmed',
+      phone: '(11) 99999-9999'
     },
     {
       id: '2',
@@ -38,16 +51,18 @@ export const AdminDashboard = () => {
       service: 'Corte Tradicional',
       barber: 'Marquinho',
       price: 'R$ 25,00',
-      status: 'confirmed'
+      status: 'confirmed',
+      phone: '(11) 88888-8888'
     },
     {
       id: '3',
       time: '14:00',
       client: 'Carlos Oliveira',
       service: 'Apenas Barba',
-      barber: 'Julin',
+      barber: 'Julinho',
       price: 'R$ 15,00',
-      status: 'completed'
+      status: 'completed',
+      phone: '(11) 77777-7777'
     },
     {
       id: '4',
@@ -56,7 +71,8 @@ export const AdminDashboard = () => {
       service: 'Corte + Barba',
       barber: 'Marquinho',
       price: 'R$ 40,00',
-      status: 'confirmed'
+      status: 'confirmed',
+      phone: '(11) 66666-6666'
     }
   ];
 
@@ -67,14 +83,44 @@ export const AdminDashboard = () => {
     planSubscriptions: 8
   };
 
-  const weeklyReport = [
-    { day: 'Seg', appointments: 12, revenue: 380 },
-    { day: 'Ter', appointments: 15, revenue: 470 },
-    { day: 'Qua', appointments: 18, revenue: 565 },
-    { day: 'Qui', appointments: 14, revenue: 420 },
-    { day: 'Sex', apartments: 16, revenue: 510 },
-    { day: 'Sáb', appointments: 20, revenue: 630 },
-    { day: 'Dom', appointments: 8, revenue: 240 }
+  const barbers = [
+    {
+      id: '1',
+      name: 'Julinho',
+      email: 'julinho@barbearia.com',
+      appointmentsThisWeek: 25,
+      revenue: 800,
+      rating: 4.9
+    },
+    {
+      id: '2',
+      name: 'Marquinho',
+      email: 'marquinho@barbearia.com',
+      appointmentsThisWeek: 22,
+      revenue: 720,
+      rating: 4.8
+    }
+  ];
+
+  const clients = [
+    {
+      id: '1',
+      name: 'João Silva',
+      email: 'joao@email.com',
+      phone: '(11) 99999-9999',
+      lastVisit: '2024-06-10',
+      totalVisits: 15,
+      hasPlan: true
+    },
+    {
+      id: '2',
+      name: 'Pedro Santos',
+      email: 'pedro@email.com',
+      phone: '(11) 88888-8888',
+      lastVisit: '2024-06-08',
+      totalVisits: 8,
+      hasPlan: false
+    }
   ];
 
   const aiInsights = [
@@ -97,6 +143,47 @@ export const AdminDashboard = () => {
       type: "success"
     }
   ];
+
+  const handleAddBarber = () => {
+    if (!newBarberName || !newBarberEmail) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Preencha nome e email do barbeiro",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Barbeiro adicionado!",
+      description: `${newBarberName} foi adicionado à equipe`,
+    });
+    
+    setNewBarberName('');
+    setNewBarberEmail('');
+  };
+
+  const handleRemoveBarber = (barberId: string) => {
+    toast({
+      title: "Barbeiro removido",
+      description: "O barbeiro foi removido da equipe",
+      variant: "destructive",
+    });
+  };
+
+  const handleSaveSmsConfig = () => {
+    toast({
+      title: "Configuração salva!",
+      description: "API de SMS configurada com sucesso",
+    });
+  };
+
+  const handleSendSms = (clientPhone: string) => {
+    toast({
+      title: "SMS enviado!",
+      description: `Lembrete enviado para ${clientPhone}`,
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -123,11 +210,13 @@ export const AdminDashboard = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="overview" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview">Visão Geral</TabsTrigger>
             <TabsTrigger value="appointments">Agendamentos</TabsTrigger>
+            <TabsTrigger value="barbers">Barbeiros</TabsTrigger>
             <TabsTrigger value="clients">Clientes</TabsTrigger>
             <TabsTrigger value="insights">IA Insights</TabsTrigger>
+            <TabsTrigger value="settings">Configurações</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-8">
@@ -215,6 +304,7 @@ export const AdminDashboard = () => {
                           <p className="text-sm text-muted-foreground">
                             {appointment.service} com {appointment.barber}
                           </p>
+                          <p className="text-sm text-muted-foreground">{appointment.phone}</p>
                         </div>
                       </div>
                       <div className="text-right space-y-2">
@@ -224,6 +314,16 @@ export const AdminDashboard = () => {
                         >
                           {appointment.status === 'completed' ? 'Concluído' : 'Confirmado'}
                         </Badge>
+                        <div>
+                          <Button
+                            size="sm"
+                            onClick={() => handleSendSms(appointment.phone)}
+                            className="bg-green-500 hover:bg-green-600"
+                          >
+                            <MessageSquare className="h-4 w-4 mr-1" />
+                            SMS
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -235,20 +335,134 @@ export const AdminDashboard = () => {
           <TabsContent value="appointments" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Gerenciar Agendamentos</CardTitle>
+                <CardTitle>Todos os Agendamentos</CardTitle>
                 <CardDescription>
-                  Visualize e gerencie todos os agendamentos
+                  Gerencie todos os agendamentos do sistema
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-8">
-                  <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">
-                    Funcionalidade de calendário completo em desenvolvimento
-                  </p>
+                <div className="space-y-4">
+                  {todayAppointments.map((appointment) => (
+                    <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center">
+                          <Calendar className="h-5 w-5 text-accent" />
+                        </div>
+                        <div>
+                          <p className="font-semibold">{appointment.client}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {appointment.service} - {appointment.time}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Barbeiro: {appointment.barber}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Badge variant="secondary">{appointment.price}</Badge>
+                        <Button size="sm" variant="outline">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button size="sm" variant="destructive">
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="barbers" className="space-y-6">
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* Lista de Barbeiros */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Equipe de Barbeiros</CardTitle>
+                  <CardDescription>
+                    Gerencie sua equipe e acompanhe a performance
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {barbers.map((barber) => (
+                      <div key={barber.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center text-black font-bold">
+                            {barber.name.charAt(0)}
+                          </div>
+                          <div>
+                            <p className="font-semibold">{barber.name}</p>
+                            <p className="text-sm text-muted-foreground">{barber.email}</p>
+                            <div className="flex items-center space-x-4 mt-1">
+                              <span className="text-sm">⭐ {barber.rating}</span>
+                              <span className="text-sm">{barber.appointmentsThisWeek} cortes</span>
+                              <span className="text-sm text-green-600">R$ {barber.revenue}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button size="sm" variant="outline">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="destructive"
+                            onClick={() => handleRemoveBarber(barber.id)}
+                          >
+                            <Trash className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Adicionar Novo Barbeiro */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <UserPlus className="mr-2 h-5 w-5" />
+                    Adicionar Barbeiro
+                  </CardTitle>
+                  <CardDescription>
+                    Cadastre um novo membro da equipe
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="barber-name">Nome Completo</Label>
+                      <Input
+                        id="barber-name"
+                        value={newBarberName}
+                        onChange={(e) => setNewBarberName(e.target.value)}
+                        placeholder="Digite o nome do barbeiro"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="barber-email">Email</Label>
+                      <Input
+                        id="barber-email"
+                        type="email"
+                        value={newBarberEmail}
+                        onChange={(e) => setNewBarberEmail(e.target.value)}
+                        placeholder="email@exemplo.com"
+                      />
+                    </div>
+                    <Button
+                      onClick={handleAddBarber}
+                      className="w-full golden-gradient text-black font-semibold"
+                    >
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      Adicionar Barbeiro
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="clients" className="space-y-6">
@@ -256,15 +470,44 @@ export const AdminDashboard = () => {
               <CardHeader>
                 <CardTitle>Gestão de Clientes</CardTitle>
                 <CardDescription>
-                  Visualize informações dos clientes e histórico
+                  Visualize e gerencie informações dos clientes
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-8">
-                  <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">
-                    Lista de clientes e histórico em desenvolvimento
-                  </p>
+                <div className="space-y-4">
+                  {clients.map((client) => (
+                    <div key={client.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold">
+                          {client.name.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="font-semibold">{client.name}</p>
+                          <p className="text-sm text-muted-foreground">{client.email}</p>
+                          <p className="text-sm text-muted-foreground">{client.phone}</p>
+                          <div className="flex items-center space-x-4 mt-1">
+                            <span className="text-sm">Última visita: {new Date(client.lastVisit).toLocaleDateString('pt-BR')}</span>
+                            <span className="text-sm">{client.totalVisits} visitas</span>
+                            {client.hasPlan && (
+                              <Badge className="bg-accent text-black">Plano Ativo</Badge>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button
+                          size="sm"
+                          onClick={() => handleSendSms(client.phone)}
+                          className="bg-green-500 hover:bg-green-600"
+                        >
+                          <MessageSquare className="h-4 w-4" />
+                        </Button>
+                        <Button size="sm" variant="outline">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -303,29 +546,57 @@ export const AdminDashboard = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
 
+          <TabsContent value="settings" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Relatório Semanal</CardTitle>
+                <CardTitle className="flex items-center">
+                  <Settings className="mr-2 h-5 w-5" />
+                  Configurações do Sistema
+                </CardTitle>
                 <CardDescription>
-                  Performance dos últimos 7 dias
+                  Configure APIs e integrações
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {weeklyReport.map((day, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-accent/10 rounded-full flex items-center justify-center">
-                          <span className="text-sm font-medium">{day.day}</span>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium">{day.appointments} agendamentos</p>
-                        </div>
-                      </div>
-                      <p className="font-semibold">R$ {day.revenue}</p>
+                <div className="space-y-6">
+                  <div>
+                    <Label htmlFor="sms-api">API de SMS - Webhook URL</Label>
+                    <div className="flex space-x-2 mt-2">
+                      <Input
+                        id="sms-api"
+                        value={smsConfig}
+                        onChange={(e) => setSmsConfig(e.target.value)}
+                        placeholder="https://api.sms-provider.com/send"
+                        className="flex-1"
+                      />
+                      <Button onClick={handleSaveSmsConfig}>
+                        Salvar
+                      </Button>
                     </div>
-                  ))}
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Configure a URL da API para envio automático de SMS
+                    </p>
+                  </div>
+
+                  <div>
+                    <Label>Mensagens SMS Configuradas</Label>
+                    <div className="space-y-2 mt-2">
+                      <div className="p-3 border rounded-lg">
+                        <p className="font-medium">Lembrete de Agendamento</p>
+                        <p className="text-sm text-muted-foreground">
+                          "Olá [NOME], você tem um agendamento na Barbearia do Julinho amanhã às [HORARIO]. Confirme sua presença!"
+                        </p>
+                      </div>
+                      <div className="p-3 border rounded-lg">
+                        <p className="font-medium">Confirmação de Agendamento</p>
+                        <p className="text-sm text-muted-foreground">
+                          "Agendamento confirmado! [NOME], seu corte está marcado para [DATA] às [HORARIO] com [BARBEIRO]."
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
